@@ -5,6 +5,7 @@ import com.basedew.dto.FundsDTO;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
 import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
@@ -162,6 +163,25 @@ public class AccountResource {
         }
         account.blockedFunds += fundsDto.funds();
         account.persist();
+        return Response.ok().build();
+    }
+
+    @DELETE
+    @Path("/{userId}/{accountId}")
+    @Transactional
+    public Response deleteAccount(@PathParam("userId") Long userId, @PathParam("accountId") Long accountId) {
+        Account account = Account.findById(accountId);
+        if (account == null || !account.userId.equals(userId)) {
+            return Response.status(Response.Status.NOT_FOUND)
+                    .entity("Specified account not found for user")
+                    .build();
+        }
+        if (account.funds != 0) {
+            return Response.status(Response.Status.CONFLICT)
+                    .entity("Can not delete account with funds on it")
+                    .build();
+        }
+        account.delete();
         return Response.ok().build();
     }
 }
