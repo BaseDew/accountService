@@ -1,7 +1,7 @@
 package com.basedew;
 
 import com.basedew.dto.CreateAccountRequest;
-import com.basedew.dto.FundsDTO;
+import com.basedew.dto.TransactionDto;
 import com.basedew.service.AccountService;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
@@ -20,7 +20,7 @@ import jakarta.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
 
-@Path("/api/v1/account")
+@Path("/api/v1/account/{userId}")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountResource {
@@ -51,7 +51,6 @@ public class AccountResource {
     }
 
     @GET
-    @Path("/{userId}")
     public Response getUserAccounts(@PathParam("userId") Long userId) {
         List<Account> accounts = accountService.getUserAccounts(userId);
         if (accounts.isEmpty()) {
@@ -63,9 +62,9 @@ public class AccountResource {
     }
 
     @GET
-    @Path("/{userId}/{accountId}")
+    @Path("/{accountId}")
     public Response getDetails(@PathParam("userId") Long userId, @PathParam("accountId") Long accountId) {
-        Account account = accountService.getDetails(userId, accountId);
+        Account account = accountService.getDetails(accountId);
         if (account != null && account.userId.equals(userId)) {
             return Response.ok(account).build();
         }
@@ -74,64 +73,8 @@ public class AccountResource {
                 .build();
     }
 
-    @PATCH
-    @Path("/{userId}/{accountId}/add")
-    @Transactional
-    public Response addFunds(@PathParam("userId") Long userId, @PathParam("accountId") Long accountId, FundsDTO fundsDto) {
-        try {
-            accountService.addFunds(userId, accountId, fundsDto);
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        }
-        return Response.ok().build();
-    }
-
-    @PATCH
-    @Path("/{userId}/{accountId}/deduct")
-    @Transactional
-    public Response deductFunds(@PathParam("userId") Long userId, @PathParam("accountId") Long accountId, FundsDTO fundsDto) {
-        try {
-            accountService.deductFunds(userId, accountId, fundsDto);
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        }
-        return Response.ok().build();
-    }
-
-    @PATCH
-    @Path("/{userId}/{accountId}/unblock")
-    @Transactional
-    public Response unblockFunds(@PathParam("userId") Long userId, @PathParam("accountId") Long accountId, FundsDTO fundsDto) {
-        try {
-            accountService.unblockFunds(userId, accountId, fundsDto);
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        }
-        return Response.ok().build();
-    }
-
-    @PATCH
-    @Path("/{userId}/{accountId}/block")
-    @Transactional
-    public Response blockFunds(@PathParam("userId") Long userId, @PathParam("accountId") Long accountId, FundsDTO fundsDto) {
-        try {
-            accountService.blockFunds(userId, accountId, fundsDto);
-        } catch (Exception e) {
-            return Response.status(Response.Status.BAD_REQUEST)
-                    .entity(e.getMessage())
-                    .build();
-        }
-        return Response.ok().build();
-    }
-
     @DELETE
-    @Path("/{userId}/{accountId}")
+    @Path("/{accountId}")
     @Transactional
     public Response deleteAccount(@PathParam("userId") Long userId, @PathParam("accountId") Long accountId) {
         try {
