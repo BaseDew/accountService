@@ -1,13 +1,12 @@
 package com.basedew;
 
 import com.basedew.dto.CreateAccountRequest;
-import com.basedew.dto.TransactionDto;
 import com.basedew.service.AccountService;
+import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
 import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.PathParam;
@@ -21,6 +20,7 @@ import java.net.URI;
 import java.util.List;
 
 @Path("/api/v1/account/{userId}")
+@ApplicationScoped
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class AccountResource {
@@ -34,6 +34,7 @@ public class AccountResource {
     @POST
     @Transactional
     public Response create(CreateAccountRequest request, @Context UriInfo uriInfo) {
+        System.out.println("Create account request");
         try {
             Account account = accountService.create(request);
             URI createdUri = uriInfo.getAbsolutePathBuilder()
